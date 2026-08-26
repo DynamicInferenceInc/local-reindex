@@ -1,42 +1,44 @@
 # local-reindex
 
-Consumer-профиль `document-indexer` для локальной папки.
+Профиль `document-indexer` для локальной папки. Один процесс = одна коллекция Qdrant.
 
-Настройки берутся из `.env` в этой папке. Compose подключает его как
-`env_file`; `IndexerSettings()` в `main.py` читает переменные процесса.
+Настройки — вложенные ключи `SOURCE__*`, `QDRANT__*`, `MODELS__*` (как в `document-indexer`).
+`IndexerSettings` / `ProfileLocal` читают `.env` из рабочей директории.
 
-## Docker
+## Зависимости
 
-Из корня `core-reindex`:
+Нужны запущенные **Ollama** и **Qdrant** на хосте. Если они уже подняты
+`it-consultant-1c` (контейнеры `it-consultant-ollama` / `it-consultant-qdrant`),
+достаточно портов `11434` и `6333`. Модель эмбеддингов: `nomic-embed-text`.
 
-```bash
-cp local-reindex/.env.example local-reindex/.env
-docker compose up -d --build local-reindex
-docker compose logs -f local-reindex
-```
-
-`WATCH_PATH` в `.env` должен совпадать с `LOCAL_DOCS_CONTAINER` в корневом
-`.env`. Документы кладутся на хосте в `LOCAL_DOCS_HOST`.
-
-Qdrant и Ollama должны быть на хосте. Из контейнера адрес — обычно
-`http://host.docker.internal:...`.
+Документы кладите в каталог `SOURCE__WATCH_PATH` (по умолчанию `docs/`).
 
 ## Нативный запуск
 
-Для `python main.py` на хосте поменяйте в `.env`:
-
-```dotenv
-WATCH_PATH=docs
-QDRANT_URL=http://127.0.0.1:6333
-OLLAMA_BASE_URL=http://127.0.0.1:11434
-```
-
 ```bash
+cp .env.example .env
+# при необходимости поправьте SOURCE__WATCH_PATH и QDRANT__*
+
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
 pip install -e .
-cp .env.example .env
 python main.py
+```
+
+Первый прогон сверкает папку с Qdrant, дальше watchdog индексирует create/modify/delete.
+
+VLM для картинок по умолчанию выключен (`MODELS__PICTURE_DESCRIPTION_ENABLED=false`).
+Чтобы включить, поставьте `true` и заранее скачайте модель: `ollama pull qwen3-vl:8b`.
+
+## Docker
+
+Образ собирается поверх `document-indexer`. Из контейнера Qdrant/Ollama обычно
+доступны как `http://host.docker.internal:6333` и `:11434` — поменяйте URL в `.env`.
+
+```bash
+cp .env.example .env
+docker compose up -d --build local-reindex
+docker compose logs -f local-reindex
 ```

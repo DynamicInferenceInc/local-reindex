@@ -1,4 +1,4 @@
-from document_indexer import IndexerSettings, run
+from document_indexer import DocumentIndexer, ProfileLocal
 
 if __name__ == "__main__":
-    run(IndexerSettings())
+    DocumentIndexer(ProfileLocal()).run()
