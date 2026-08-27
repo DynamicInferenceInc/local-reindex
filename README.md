@@ -1,9 +1,11 @@
 # local-reindex
 
-Consumer-профиль `document-indexer` для локальной папки.
+Consumer-профиль `document-indexer` для локальной папки. Payload как у
+дефолтного индексатора, без LLM-полей резюме.
 
-Настройки берутся из `.env` в этой папке. Compose подключает его как
-`env_file`; `IndexerSettings()` в `main.py` читает переменные процесса.
+Настройки — вложенные ключи `SOURCE__` / `QDRANT__` / `MODELS__` в `.env`.
+Compose подключает файл как `env_file`; `IndexerSettings()` в `main.py`
+читает переменные процесса.
 
 ## Docker
 
@@ -15,20 +17,19 @@ docker compose up -d --build local-reindex
 docker compose logs -f local-reindex
 ```
 
-`WATCH_PATH` в `.env` должен совпадать с `LOCAL_DOCS_CONTAINER` в корневом
+`SOURCE__WATCH_PATH` должен совпадать с `LOCAL_DOCS_CONTAINER` в корневом
 `.env`. Документы кладутся на хосте в `LOCAL_DOCS_HOST`.
 
-Qdrant и Ollama должны быть на хосте. Из контейнера адрес — обычно
-`http://host.docker.internal:...`.
+Qdrant и Ollama на хосте. Из контейнера — `http://host.docker.internal:...`.
 
 ## Нативный запуск
 
-Для `python main.py` на хосте поменяйте в `.env`:
+В `.env` для хоста:
 
 ```dotenv
-WATCH_PATH=docs
-QDRANT_URL=http://127.0.0.1:6333
-OLLAMA_BASE_URL=http://127.0.0.1:11434
+SOURCE__WATCH_PATH=docs
+QDRANT__URL=http://127.0.0.1:6333
+MODELS__OLLAMA_BASE_URL=http://127.0.0.1:11434
 ```
 
 ```bash
