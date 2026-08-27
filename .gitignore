@@ -3,5 +3,6 @@
 venv/
 __pycache__/
 *.pyc
+indexer.log
 docs/**
 !docs/.gitkeep
