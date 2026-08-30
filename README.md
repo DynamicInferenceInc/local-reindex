@@ -3,7 +3,7 @@
 Один образ, два режима через `INDEXER_PROFILE`:
 
 - `default` (или переменная не `resume`) — обычный payload, `run(IndexerSettings())`;
-- `resume` — `ResumePayloadBuilder` + `JsonSchemaEnricher`, коллекция `docs-cv`.
+- `resume` — `ResumeProjectChunker` + `ResumePayloadBuilder` + `FunctionalDirectionEnricher`, коллекция `docs-cv`.
 
 ## Docker
 
