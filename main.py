@@ -12,6 +12,8 @@ from document_indexer.examples.resume import (
     ResumeProjectChunker,
     load_resume_prompt,
     load_resume_schema,
+    parse_only_enabled,
+    run_resume_parse_audit,
 )
 
 
@@ -39,8 +41,22 @@ def _resume_indexer() -> DocumentIndexer:
     )
 
 
+def _log_startup() -> None:
+    print(
+        "Startup INDEXER_PROFILE="
+        f"{os.environ.get('INDEXER_PROFILE')!r} "
+        f"RESUME_PARSE_ONLY={os.environ.get('RESUME_PARSE_ONLY')!r} "
+        f"parse_only={parse_only_enabled()}",
+        flush=True,
+    )
+
+
 if __name__ == "__main__":
+    _log_startup()
     if os.environ.get("INDEXER_PROFILE") == "resume":
-        _resume_indexer().run()
+        if parse_only_enabled():
+            run_resume_parse_audit(ProfileLocal())
+        else:
+            _resume_indexer().run()
     else:
         run(IndexerSettings())
