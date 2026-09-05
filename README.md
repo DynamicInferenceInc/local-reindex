@@ -1,9 +1,11 @@
 # local-reindex
 
-Один образ, два режима через `INDEXER_PROFILE`:
+Один образ, два режима через `CHUNKING__STRATEGY`:
 
-- `default` (или переменная не `resume`) — обычный payload, `run(IndexerSettings())`;
-- `resume` — `ResumeProjectChunker` + `ResumePayloadBuilder` + `FunctionalDirectionEnricher`, коллекция `docs-cv`.
+- `table_aware` — обычные документы, коллекция `docs-local`;
+- `resume_project` — резюме, коллекция `docs-cv`.
+
+`document_indexer` сам выбирает чанкер, payload и LLM по стратегии.
 
 ## Docker
 
@@ -16,10 +18,10 @@ docker compose up -d --build local-reindex local-cv
 docker compose logs -f local-reindex local-cv
 ```
 
-| Сервис | env | папка на хосте | коллекция |
-|---|---|---|---|
-| `local-reindex` | `.env` | `LOCAL_DOCS_HOST` | `docs-local` |
-| `local-cv` | `.env.cv` | `LOCAL_CV_HOST` | `docs-cv` |
+| Сервис | env | папка на хосте | коллекция | стратегия |
+|---|---|---|---|---|
+| `local-reindex` | `.env` | `LOCAL_DOCS_HOST` | `docs-local` | `table_aware` |
+| `local-cv` | `.env.cv` | `LOCAL_CV_HOST` | `docs-cv` | `resume_project` |
 
 `SOURCE__WATCH_PATH` в каждом файле должен совпадать с контейнерным путём
 в корневом `.env` (`/data/docs` и `/data/cv`).
